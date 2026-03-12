@@ -1,0 +1,235 @@
+#Data preprocessing
+
+Unzipinimas:
+gunzip GRCh38.primary_assembly.genome.fa.gz 
+
+Suskaiciuoja kiek chromosomu:
+grep -c ">" GRCh38.primary_assembly.genome.fa 
+
+Indeksavimas:
+hisat2-build -p 8 GRCh38.primary_assembly.genome.fa indexed_reference
+
+
+#Raw data QC, mapping and QC
+
+Sukuriam direktorijas:
+mkdir fastqc_results
+mkdir multiqc_results
+
+Raw data QC ir multiqc:
+fastqc *.fastq.gz -o ~/HW1/raw_data/fastqc_results
+multiqc ~/HW1/raw_data/fastqc_results
+
+Trimming:
+trim_galore -j 6 --paired --quality 20 --length 30 -o trimming_results SRR11647686_1.fastq.gz SRR11647686_2.fastq.gz   +
+trim_galore -j 6 --paired --quality 20 --length 30 -o trimming_results SRR11647688_1.fastq.gz SRR11647688_2.fastq.gz   +
+trim_galore -j 6 --paired --quality 20 --length 30 -o trimming_results SRR11647690_1.fastq.gz SRR11647690_2.fastq.gz   +
+trim_galore -j 6 --paired --quality 20 --length 30 -o trimming_results SRR11647696_1.fastq.gz SRR11647696_2.fastq.gz   +
+trim_galore -j 6 --paired --quality 20 --length 30 -o trimming_results SRR11647698_1.fastq.gz SRR11647698_2.fastq.gz   +
+trim_galore -j 6 --paired --quality 20 --length 30 -o trimming_results SRR11647700_1.fastq.gz SRR11647700_2.fastq.gz   +
+
+QC after trimming:
+mkdir trimmingqc_results
+fastqc *.fq.gz -o ~/HW1/raw_data/trimming_results/trimmingqc_results
+multiqc
+
+Mapping:
+hisat2 -p 6 -x ~/HW1/references/indexed_reference --no-unal --no-mixed --no-discordant -1 ~/HW1/raw_data/trimming_results/SRR11647686_1_val_1.fq.gz -2 ~/HW1/raw_data/trimming_results/SRR11647686_2_val_2.fq.gz -S SRR11647686.sam 
+hisat2 -p 6 -x ~/HW1/references/indexed_reference --no-unal --no-mixed --no-discordant -1 ~/HW1/raw_data/trimming_results/SRR11647688_1_val_1.fq.gz -2 ~/HW1/raw_data/trimming_results/SRR11647688_2_val_2.fq.gz -S SRR11647688.sam 
+hisat2 -p 6 -x ~/HW1/references/indexed_reference --no-unal --no-mixed --no-discordant -1 ~/HW1/raw_data/trimming_results/SRR11647690_1_val_1.fq.gz -2 ~/HW1/raw_data/trimming_results/SRR11647690_2_val_2.fq.gz -S SRR11647690.sam 
+hisat2 -p 6 -x ~/HW1/references/indexed_reference --no-unal --no-mixed --no-discordant -1 ~/HW1/raw_data/trimming_results/SRR11647696_1_val_1.fq.gz -2 ~/HW1/raw_data/trimming_results/SRR11647696_2_val_2.fq.gz -S SRR11647696.sam 
+hisat2 -p 6 -x ~/HW1/references/indexed_reference --no-unal --no-mixed --no-discordant -1 ~/HW1/raw_data/trimming_results/SRR11647698_1_val_1.fq.gz -2 ~/HW1/raw_data/trimming_results/SRR11647698_2_val_2.fq.gz -S SRR11647698.sam 
+hisat2 -p 6 -x ~/HW1/references/indexed_reference --no-unal --no-mixed --no-discordant -1 ~/HW1/raw_data/trimming_results/SRR11647700_1_val_1.fq.gz -2 ~/HW1/raw_data/trimming_results/SRR11647700_2_val_2.fq.gz -S SRR11647700.sam
+
+Mapping rate:
+hisat2 -p 6 \
+-x ~/HW1/references/indexed_reference \
+--no-unal --no-mixed --no-discordant \
+-1 ~/HW1/raw_data/trimming_results/SRR11647686_1_val_1.fq.gz \
+-2 ~/HW1/raw_data/trimming_results/SRR11647686_2_val_2.fq.gz \
+-S SRR11647686.sam \
+2> SRR11647686_hisat2.log
+
+hisat2 -p 6 \
+-x ~/HW1/references/indexed_reference \
+--no-unal --no-mixed --no-discordant \
+-1 ~/HW1/raw_data/trimming_results/SRR11647688_1_val_1.fq.gz \
+-2 ~/HW1/raw_data/trimming_results/SRR11647688_2_val_2.fq.gz \
+-S SRR11647688.sam \
+2> SRR11647688_hisat2.log
+
+hisat2 -p 6 \
+-x ~/HW1/references/indexed_reference \
+--no-unal --no-mixed --no-discordant \
+-1 ~/HW1/raw_data/trimming_results/SRR11647690_1_val_1.fq.gz \
+-2 ~/HW1/raw_data/trimming_results/SRR11647690_2_val_2.fq.gz \
+-S SRR11647690.sam \
+2> SRR11647690_hisat2.log
+
+hisat2 -p 6 \
+-x ~/HW1/references/indexed_reference \
+--no-unal --no-mixed --no-discordant \
+-1 ~/HW1/raw_data/trimming_results/SRR11647696_1_val_1.fq.gz \
+-2 ~/HW1/raw_data/trimming_results/SRR11647696_2_val_2.fq.gz \
+-S SRR11647696.sam \
+2> SRR11647696_hisat2.log
+
+hisat2 -p 6 \
+-x ~/HW1/references/indexed_reference \
+--no-unal --no-mixed --no-discordant \
+-1 ~/HW1/raw_data/trimming_results/SRR11647698_1_val_1.fq.gz \
+-2 ~/HW1/raw_data/trimming_results/SRR11647698_2_val_2.fq.gz \
+-S SRR11647698.sam \
+2> SRR11647698_hisat2.log
+
+hisat2 -p 6 \
+-x ~/HW1/references/indexed_reference \
+--no-unal --no-mixed --no-discordant \
+-1 ~/HW1/raw_data/trimming_results/SRR11647700_1_val_1.fq.gz \
+-2 ~/HW1/raw_data/trimming_results/SRR11647700_2_val_2.fq.gz \
+-S SRR11647700.sam \
+2> SRR11647700_hisat2.log
+
+cat SRR11647686_hisat2.log
+cat SRR11647688_hisat2.log
+cat SRR11647690_hisat2.log
+cat SRR11647696_hisat2.log
+cat SRR11647698_hisat2.log
+cat SRR11647700_hisat2.log
+
+Report the number of reads used for mapping:
+samtools flagstat SRR11647686.sam    18275638 reads
+samtools flagstat SRR11647688.sam    18349306 reads
+samtools flagstat SRR11647690.sam    17108526 reads
+samtools flagstat SRR11647696.sam    19483607 reads
+samtools flagstat SRR11647698.sam    18688334 reads
+samtools flagstat SRR11647700.sam    18184758 reads
+
+SAM > BAM:
+samtools view -@ 6 -bS SRR11647686.sam > SRR11647686.bam
+samtools view -@ 6 -bS SRR11647688.sam > SRR11647688.bam
+samtools view -@ 6 -bS SRR11647690.sam > SRR11647690.bam
+samtools view -@ 6 -bS SRR11647696.sam > SRR11647696.bam
+samtools view -@ 6 -bS SRR11647698.sam > SRR11647698.bam
+samtools view -@ 6 -bS SRR11647700.sam > SRR11647700.bam
+
+Duplikatai:
+samtools collate -@ 6 -O -u SRR11647686.bam | samtools fixmate -@ 6 -m -u - - | samtools sort -@ 6 -u - | samtools markdup -@ 6 - SRR11647686_markdup.bam
+samtools collate -@ 6 -O -u SRR11647688.bam | samtools fixmate -@ 6 -m -u - - | samtools sort -@ 6 -u - | samtools markdup -@ 6 - SRR11647689_markdup.bam
+samtools collate -@ 6 -O -u SRR11647690.bam | samtools fixmate -@ 6 -m -u - - | samtools sort -@ 6 -u - | samtools markdup -@ 6 - SRR11647690_markdup.bam
+samtools collate -@ 6 -O -u SRR11647696.bam | samtools fixmate -@ 6 -m -u - - | samtools sort -@ 6 -u - | samtools markdup -@ 6 - SRR11647696_markdup.bam
+samtools collate -@ 6 -O -u SRR11647698.bam | samtools fixmate -@ 6 -m -u - - | samtools sort -@ 6 -u - | samtools markdup -@ 6 - SRR11647698_markdup.bam
+samtools collate -@ 6 -O -u SRR11647700.bam | samtools fixmate -@ 6 -m -u - - | samtools sort -@ 6 -u - | samtools markdup -@ 6 - SRR11647700_markdup.bam 
+
+Parodo, kiek duplikatų:
+samtools view -c -f 1024 SRR11647686_markdup.bam
+samtools view -c -f 1024 SRR11647689_markdup.bam 
+samtools view -c -f 1024 SRR11647690_markdup.bam 
+samtools view -c -f 1024 SRR11647696_markdup.bam 
+samtools view -c -f 1024 SRR11647698_markdup.bam 
+samtools view -c -f 1024 SRR11647700_markdup.bam  
+
+Kita info:
+samtools flagstat SRR11647686_markdup.bam
+samtools flagstat SRR11647689_markdup.bam 
+samtools flagstat SRR11647690_markdup.bam 
+samtools flagstat SRR11647696_markdup.bam 
+samtools flagstat SRR11647698_markdup.bam 
+samtools flagstat SRR11647700_markdup.bam  
+
+Sorting:
+samtools sort -@ 6 SRR11647686.bam -o SRR11647686.sorted.bam 
+samtools sort -@ 6 SRR11647688.bam -o SRR11647688.sorted.bam 
+samtools sort -@ 6 SRR11647690.bam -o SRR11647690.sorted.bam 
+samtools sort -@ 6 SRR11647696.bam -o SRR11647696.sorted.bam 
+samtools sort -@ 6 SRR11647698.bam -o SRR11647698.sorted.bam 
+samtools sort -@ 6 SRR11647700.bam -o SRR11647700.sorted.bam 
+
+Indexing:
+samtools index -@ 6 SRR11647686.sorted.bam 
+samtools index -@ 6 SRR11647688.sorted.bam
+samtools index -@ 6 SRR11647690.sorted.bam
+samtools index -@ 6 SRR11647696.sorted.bam
+samtools index -@ 6 SRR11647698.sorted.bam
+samtools index -@ 6 SRR11647700.sorted.bam
+# output yra .bai
+
+??Coverage:
+samtools coverage SRR11647686.sorted.bam 
+samtools coverage SRR11647688.sorted.bam
+samtools coverage SRR11647690.sorted.bam
+samtools coverage SRR11647696.sorted.bam
+samtools coverage SRR11647698.sorted.bam
+samtools coverage SRR11647700.sorted.bam
+
+Parsisiunčiam bed files:
+wget link basic bed
+wget link housekeeping bed
+gunzip -c ~/HW1/bed_files/basic_bed > ~/HW1/bed_files/basic_bed.bed
+
+---------------------------------------------------------
+GRAFIKAI:
+
+Genebodycoverage:
+conda activate rseqc_env
+geneBody_coverage.py -r ~/HW1/bed_files/basic_bed.bed -i SRR11647686.sorted.bam,SRR11647688.sorted.bam,SRR11647690.sorted.bam,SRR11647696.sorted.bam,SRR11647698.sorted.bam,SRR11647700.sorted.bam -o ~/HW1/mapped_data_quality/coverage_output
+
+Koreliacijos matrica:
+multiBamSummary bins --bamfiles *.sorted.bam -o ~/HW1/mapped_data_quality/corr_matrix.npz -p 6
+
+Koreliacijos grafikas:
+plotCorrelation -in corr_matrix.npz -c spearman -p heatmap -o corr_plot.png
+
+PCA:
+plotPCA -in corr_matrix.npz -o pca.png
+
+Inner distance:
+inner_distance.py -r ~/HW1/bed_files/basic_bed.bed -i ~/HW1/mapping_results/SRR11647686.sorted.bam -o SRR11647686_inner_distance
+inner_distance.py -r ~/HW1/bed_files/basic_bed.bed -i ~/HW1/mapping_results/SRR11647688.sorted.bam -o SRR11647688_inner_distance
+inner_distance.py -r ~/HW1/bed_files/basic_bed.bed -i ~/HW1/mapping_results/SRR11647690.sorted.bam -o SRR11647690_inner_distance
+inner_distance.py -r ~/HW1/bed_files/basic_bed.bed -i ~/HW1/mapping_results/SRR11647696.sorted.bam -o SRR11647696_inner_distance
+inner_distance.py -r ~/HW1/bed_files/basic_bed.bed -i ~/HW1/mapping_results/SRR11647698.sorted.bam -o SRR11647698_inner_distance
+inner_distance.py -r ~/HW1/bed_files/basic_bed.bed -i ~/HW1/mapping_results/SRR11647700.sorted.bam -o SRR11647700_inner_distance
+
+Clipping profile:
+clipping_profile.py -i ~/HW1/mapping_results/SRR11647686.sorted.bam -o SRR11647686 -s PE
+clipping_profile.py -i ~/HW1/mapping_results/SRR11647688.sorted.bam -o SRR11647688 -s PE
+clipping_profile.py -i ~/HW1/mapping_results/SRR11647690.sorted.bam -o SRR11647690 -s PE
+clipping_profile.py -i ~/HW1/mapping_results/SRR11647696.sorted.bam -o SRR11647696 -s PE
+clipping_profile.py -i ~/HW1/mapping_results/SRR11647698.sorted.bam -o SRR11647698 -s PE
+clipping_profile.py -i ~/HW1/mapping_results/SRR11647700.sorted.bam -o SRR11647700 -s PE
+
+Annotated junctions:
+junction_annotation.py -r ~/HW1/bed_files/basic_bed.bed -i ~/HW1/mapping_results/SRR11647686.sorted.bam -o SRR11647686
+junction_annotation.py -r ~/HW1/bed_files/basic_bed.bed -i ~/HW1/mapping_results/SRR11647688.sorted.bam -o SRR11647688
+junction_annotation.py -r ~/HW1/bed_files/basic_bed.bed -i ~/HW1/mapping_results/SRR11647690.sorted.bam -o SRR11647690
+junction_annotation.py -r ~/HW1/bed_files/basic_bed.bed -i ~/HW1/mapping_results/SRR11647696.sorted.bam -o SRR11647696
+junction_annotation.py -r ~/HW1/bed_files/basic_bed.bed -i ~/HW1/mapping_results/SRR11647698.sorted.bam -o SRR11647698
+junction_annotation.py -r ~/HW1/bed_files/basic_bed.bed -i ~/HW1/mapping_results/SRR11647700.sorted.bam -o SRR11647700
+----------------------------------------------------------------------
+
+Library type determination:
+infer_experiment.py -r ~/HW1/bed_files/basic_bed.bed -i ~/HW1/mapping_results/SRR11647686.sorted.bam
+
+This is PairEnd Data
+Fraction of reads failed to determine: 0.0639
+Fraction of reads explained by "1++,1--,2+-,2-+": 0.4610
+Fraction of reads explained by "1+-,1-+,2++,2--": 0.4751
+-> unstranded, nes 50/50
+
+Quantification:
+mkdir feature_counts
+featureCounts -a ~/HW1/references/gencode.v49.primary_assembly.annotation.gtf.gz -o ~/HW1/feature_counts/count_table.txt -t exon -g gene_id -p -T 6 -s 0 ~/HW1/mapping_results/*.sorted.bam
+
+Is anotacijos failo issitraukiam gene_id, gene_name ir gene_type
+zcat ~/HW1/references/gencode.v49.primary_assembly.annotation.gtf.gz \
+| awk 'BEGIN{FS="\t"; OFS="\t"} $3=="gene" {
+    gene_id=""; gene_type="";
+    if (match($9, /gene_id "[^"]+"/)) {
+        gene_id=substr($9, RSTART+9, RLENGTH-10)
+    }
+    if (match($9, /gene_type "[^"]+"/)) {
+        gene_type=substr($9, RSTART+11, RLENGTH-12)
+    }
+    print gene_id, gene_type
+}' > gene_id_type.tsv

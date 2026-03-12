@@ -2,3 +2,8 @@
 *.sam
 *.gz
 
+bed_files/
+mapping_results/
+raw_data/
+references/
+
